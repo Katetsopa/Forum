@@ -1,0 +1,21 @@
+﻿@model MVC.PresentationEntity.PostPO
+
+@{
+    ViewBag.Title = "CreatePost";
+}
+
+<div class="thumbnail">
+    @using (Html.BeginForm())
+    {
+        <div class="header">
+            @Html.AntiForgeryToken()
+            @Html.ValidationSummary(true, "", new { @class = "text-danger" })
+            @Html.EditorFor(model => model.MainText, new { htmlAttributes = new { @class = "form-control" } }) 
+            @Html.HiddenFor(model => model.ThemeId)
+        </div>
+
+        <div class="right">
+            <input type="submit" value="Create" class="btn btn-default" /> 
+        </div>
+    }
+</div>

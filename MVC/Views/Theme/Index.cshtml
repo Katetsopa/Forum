@@ -1,0 +1,29 @@
+﻿@model IEnumerable<MVC.PresentationEntity.ThemePO>
+
+@{
+    ViewBag.Title = "Index";
+}
+
+<h2>Themes</h2>
+
+<p>
+    @if (User.IsInRole("admin")) {
+    @Html.ActionLink("Create New", "Create")}
+</p>
+
+@foreach (var item in Model) {
+<div class="thumbnail"> 
+    <div class="header">
+            @Html.DisplayFor(modelItem => item.Header)
+        </div>
+    <div class="left">
+            @Html.DisplayFor(modelItem => item.MainText)
+        </div>
+    <div class="right">
+            @Html.ActionLink("Posts", "Details", new { id = item.ThemeId  }) 
+        @if (User.IsInRole("admin"))
+        { <a>|</a> @Html.ActionLink("Delete", "Delete", new { id=item.ThemeId })}
+    </div>
+    </div>
+}
+

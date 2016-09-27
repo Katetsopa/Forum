@@ -1,0 +1,24 @@
+﻿@model MVC.PresentationEntity.ThemePO
+
+@{
+    ViewBag.Title = "Details";
+}
+
+<div class="jumbotron">  
+
+       <h2>     @Html.DisplayFor(model => model.Header) </h2>
+
+            @Html.DisplayFor(model => model.MainText)
+
+  </div>
+
+    @foreach (var item in Model.Posts)
+    {
+        <div class="thumbnail">
+            @Html.DisplayFor(modelItem => item.MainText)
+        </div>
+    }
+@if (User.Identity.IsAuthenticated)
+{
+@Html.Partial("CreatePost", new MVC.PresentationEntity.PostPO() { ThemeId = Model.ThemeId })
+}

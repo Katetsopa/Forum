@@ -1,0 +1,14 @@
+﻿@model MVC.Models.ErrorModel
+
+@{
+    ViewBag.Title = "Error";
+}
+
+<h2>Error</h2>
+
+<h3>
+    @Html.DisplayFor(model => model.ErrorMessge)
+</h3>
+<p>
+    @Html.ActionLink("Themes", "Index")
+</p>
