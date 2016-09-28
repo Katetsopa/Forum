@@ -113,7 +113,6 @@ namespace MVC.Controllers
 
         //
         // GET: /Account/Register
-        [HttpGet]
         [AllowAnonymous]
         public ActionResult Register()
         {
@@ -139,8 +138,8 @@ namespace MVC.Controllers
                     Name = model.Name,
                     Role = "user"
                 };
-                OperationDetails operationDetails = await UserService.Create(userDto);
-                if (operationDetails.Succedeed)
+                 OperationDetails operationDetails = await UserService.Create(userDto);
+            if (operationDetails.Succedeed)
                     return View("SuccessRegister");
                 else
                     ModelState.AddModelError(operationDetails.Property, operationDetails.Message);
@@ -166,10 +165,10 @@ namespace MVC.Controllers
        // [HttpGet]
         public ActionResult PrivateAccount()
         {
-            string uid = User.Identity.GetUserId();
-            //var user = UserManager.FindByEmail(User.Identity.Name);
-            RegisterModel rm = new RegisterModel() { Email = User.Identity.Name, Name = "" };
-          // rm = ViewBag;
+            //string uid = User.Identity.GetUserId();
+            //var user = UserManager.FindById(User.Identity.GetUserId());
+            
+            RegisterModel rm = new RegisterModel() { Email = User.Identity.GetUserName(), Name = user.UserName };
             return View(rm);
         }
 
