@@ -12,7 +12,7 @@ namespace BLL.Interfaces
 {
     public interface IThemeService : IDisposable
     {
-        void Create(ThemeDTO themeDto);
+        Task<OperationDetails> Create(ThemeDTO themeDto);
         IEnumerable<PostDTO> GetPosts(ThemeDTO themeDto);
         IEnumerable<ThemeDTO> GetAllTheme();
         ThemeDTO FindByHeader(string header);

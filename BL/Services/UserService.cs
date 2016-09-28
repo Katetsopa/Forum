@@ -23,6 +23,7 @@ namespace BLL.Services
             Database = uow;
         }
 
+
         public async Task<ClaimsIdentity> Authenticate(UserDTO userDto)
         {
             ClaimsIdentity claim = null;
@@ -33,31 +34,33 @@ namespace BLL.Services
                 claim = await Database.UserManager.CreateIdentityAsync(user, DefaultAuthenticationTypes.ApplicationCookie);
             return claim;
         }
-
+        
+        /// <summary>
+        /// Create new user
+        /// </summary>
+        /// <param name="userDto">user</param>
+        /// <returns></returns>
         public async Task<OperationDetails> Create(UserDTO userDto)
         {
             ApplicationUser user = await Database.UserManager.FindByEmailAsync(userDto.Email);
             if (user == null)
             {                
-                // создаем профиль клиента  //EmailConfirmed bool //PhoneNumberConfirmed bool //TwoFactorEnabled bool  //LockoutEnabled bool //AccessFailedCount int //UserName string
                 ApplicationUser appUser = new ApplicationUser { Email=userDto.Email, PasswordHash = userDto.Password, EmailConfirmed = true, PhoneNumberConfirmed=false, TwoFactorEnabled=true, LockoutEnabled=false, AccessFailedCount = 5,  Name = userDto.Name ,  UserName = userDto.UserName };
                 try
                 {
                     await Database.UserManager.CreateAsync(appUser, userDto.Password);
-
                     await Database.UserManager.AddToRoleAsync(appUser.Id, userDto.Role);
-
                     await Database.SaveAsync();
-                    return new OperationDetails(true, "Регистрация успешно пройдена", "");
+                    return new OperationDetails(true, "Successful registration", "");
                 }
                 catch
                 {
-                    return new OperationDetails(false, "Проблемы при регистрации", "");
+                    return new OperationDetails(false, "Registration failed", "");
                 }
             }
             else
             {
-                return new OperationDetails(false, "Пользователь с таким логином уже существует", "Email");
+                return new OperationDetails(false, "User with such login already exists", "Email");
             }
         }
 
@@ -66,6 +69,12 @@ namespace BLL.Services
             Database.Dispose();
         }
 
+        /// <summary>
+        /// Create user with list of roles
+        /// </summary>
+        /// <param name="adminDto">user</param>
+        /// <param name="roles">list of roles</param>
+        /// <returns></returns>
         public async Task SetInitialData(UserDTO adminDto, List<string> roles)
         {
             foreach (string roleName in roles)

@@ -20,15 +20,15 @@ namespace MVC.Controllers
 {
     public class AccountController : Controller
     {
-        private ApplicationSignInManager _signInManager;
-        private ApplicationUserManager _userManager;
+        //private ApplicationSignInManager _signInManager;
+       // private ApplicationUserManager _userManager;
 
 
-        public AccountController(ApplicationUserManager userManager, ApplicationSignInManager signInManager)
-        {
-            UserManager = userManager;
-            SignInManager = signInManager;
-        }
+       // public AccountController(ApplicationUserManager userManager, ApplicationSignInManager signInManager)
+        //{
+         //   UserManager = userManager;
+          //  SignInManager = signInManager;
+        //}
 
         private IUserService UserService
         {
@@ -38,7 +38,7 @@ namespace MVC.Controllers
             }
         }
 
-        private IAuthenticationManager AuthenticationManagerr
+        private IAuthenticationManager AuthenticationManager
         {
             get
             {
@@ -46,29 +46,29 @@ namespace MVC.Controllers
             }
         }
 
-        public ApplicationSignInManager SignInManager
-        {
-            get
-            {
-                return _signInManager ?? HttpContext.GetOwinContext().Get<ApplicationSignInManager>();
-            }
-            private set
-            {
-                _signInManager = value;
-            }
-        }
+        //public ApplicationSignInManager SignInManager
+        //{
+        //    get
+        //    {
+        //        return _signInManager ?? HttpContext.GetOwinContext().Get<ApplicationSignInManager>();
+        //    }
+        //    private set
+        //    {
+        //        _signInManager = value;
+        //    }
+        //}
 
-        public ApplicationUserManager UserManager
-        {
-            get
-            {
-                return _userManager ?? HttpContext.GetOwinContext().GetUserManager<ApplicationUserManager>();
-            }
-            private set
-            {
-                _userManager = value;
-            }
-        }
+        //public ApplicationUserManager UserManager
+        //{
+        //    get
+        //    {
+        //        return _userManager ?? HttpContext.GetOwinContext().GetUserManager<ApplicationUserManager>();
+        //    }
+        //    private set
+        //    {
+        //        _userManager = value;
+        //    }
+        //}
 
         //
         // GET: /Account/Login
@@ -98,8 +98,8 @@ namespace MVC.Controllers
                 }
                 else
                 {
-                    AuthenticationManagerr.SignOut();
-                    AuthenticationManagerr.SignIn(new AuthenticationProperties
+                    AuthenticationManager.SignOut();
+                    AuthenticationManager.SignIn(new AuthenticationProperties
                     {
                         IsPersistent = true
                     }, claim);
@@ -153,7 +153,7 @@ namespace MVC.Controllers
         // POST: /Account/Logout
         public ActionResult Logout()
         {
-            AuthenticationManagerr.SignOut();
+            AuthenticationManager.SignOut();
             return RedirectToAction("Index", "Home");
         }
 
@@ -165,10 +165,7 @@ namespace MVC.Controllers
        // [HttpGet]
         public ActionResult PrivateAccount()
         {
-            //string uid = User.Identity.GetUserId();
-            //var user = UserManager.FindById(User.Identity.GetUserId());
-            
-            RegisterModel rm = new RegisterModel() { Email = User.Identity.GetUserName(), Name = user.UserName };
+            RegisterModel rm = new RegisterModel() { Email = User.Identity.GetUserName(), Name = "" };
             return View(rm);
         }
 
@@ -178,17 +175,20 @@ namespace MVC.Controllers
         {
             if (disposing)
             {
-                if (_userManager != null)
-                {
-                    _userManager.Dispose();
-                    _userManager = null;
-                }
+                UserService.Dispose();
+                
+               // AuthenticationManager
+                //if (_userManager != null)
+                //{
+                //    _userManager.Dispose();
+                //    _userManager = null;
+                //}
 
-                if (_signInManager != null)
-                {
-                    _signInManager.Dispose();
-                    _signInManager = null;
-                }
+                //if (_signInManager != null)
+                //{
+                //    _signInManager.Dispose();
+                //    _signInManager = null;
+                //}
             }
 
             base.Dispose(disposing);
@@ -198,7 +198,7 @@ namespace MVC.Controllers
         // Used for XSRF protection when adding external logins
         private const string XsrfKey = "XsrfId";
 
-        private IAuthenticationManager AuthenticationManager
+        private IAuthenticationManager AuthenticationManagerr
         {
             get
             {

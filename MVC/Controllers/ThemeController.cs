@@ -123,10 +123,8 @@ namespace MVC.Controllers
         // POST: Theme/Create
         [HttpPost]
         [Authorize(Roles = "admin")]
-        public ActionResult Create(ThemeModel theme)
+        public async System.Threading.Tasks.Task<ActionResult> Create(ThemeModel theme)
         {
-            try
-            {
                 if (ModelState.IsValid)
                 {
                     ThemeDTO themeDto = new ThemeDTO()
@@ -135,15 +133,13 @@ namespace MVC.Controllers
                         MainText = theme.MainText,
                     };
 
-                        service.Create(themeDto);
+                    OperationDetails operationDetails = await service.Create(themeDto);
+                    if (operationDetails.Succedeed)
+                        return RedirectToAction("Index");
+                    else
+                        return View("Error", new ErrorModel() { ErrorMessge = "Can't create theme." });
                 }
-                
-                return RedirectToAction("Index");
-            }
-            catch
-            {
-                return View("Error", new ErrorModel() { ErrorMessge = "Can't create theme."});
-            }
+                return View("Error", new ErrorModel() { ErrorMessge = "Can't create theme." });
         }
 
 

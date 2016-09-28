@@ -20,15 +20,19 @@ namespace BLL.Services
             Database = uow;
         }
 
-        public void Create(ThemeDTO themeDto)
+        public async Task<OperationDetails> Create(ThemeDTO themeDto)
         {
-            if (themeDto == null)
-                throw new ValidationException("Can't create new theme", "null theme parametr");
             try
             {
-                var theme = ThemeMapper.Map(themeDto);
-                Database.ThemeRepository.Add(theme);
-                Database.SaveAsync();
+                if (themeDto == null)
+                    return new OperationDetails(false, "null imput parametr", "ThemeDTO");
+                else
+                {
+                    var theme = ThemeMapper.Map(themeDto);
+                    Database.ThemeRepository.Add(theme);
+                    await Database.SaveAsync();
+                    return new OperationDetails(true, "Theme created", "");
+                }
             }
             catch { throw new ValidationException("Problems with creation new theme", ""); }
         }
@@ -66,7 +70,6 @@ namespace BLL.Services
         {
             Database.ThemeRepository.Delete(id);
             Database.SaveAsync();
-            //throw new NotImplementedException();
         }
     }
 }
