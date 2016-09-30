@@ -99,24 +99,23 @@ namespace MVC.Controllers
         [HttpGet]
         public ActionResult Details(int id, PostPO post)
         {
-                ViewBag.ThemeId = id;
-              //  post.ThemeId = id;
-              //  post.UserId = User.Identity.GetUserId();
-                if (service.FindById(ViewBag.ThemeId) == null)
-                {
-                    return RedirectToAction("Index");
-                }
-                var temp1 = service.GetPosts(service.FindById(ViewBag.ThemeId));
-                var posts = PostPOMapper.Map(temp1);
-                var temp = service.FindById(id);
-                ThemePO theme = new ThemePO() { ThemeId = id, Header = temp.Header, MainText = temp.MainText, Posts = posts };
-                return View(theme);
+            ViewBag.ThemeId = id;
+            if (service.FindById(ViewBag.ThemeId) == null)
+            {
+                return RedirectToAction("Index");
+            }
+            var temp = service.FindById(id);
+            var temp1 = service.GetPosts(temp);
+            var posts = PostPOMapper.Map(temp1.ToList());
+
+            ThemePO theme = new ThemePO() { ThemeId = id, Header = temp.Header, MainText = temp.MainText, Posts = posts };
+            return View(theme);
         }
 
         // GET: Theme/Create
         [Authorize(Roles = "admin")]
         public ActionResult Create()
-        { 
+        {
             return View("CreateTheme");
         }
 
@@ -125,21 +124,21 @@ namespace MVC.Controllers
         [Authorize(Roles = "admin")]
         public async System.Threading.Tasks.Task<ActionResult> Create(ThemeModel theme)
         {
-                if (ModelState.IsValid)
+            if (ModelState.IsValid)
+            {
+                ThemeDTO themeDto = new ThemeDTO()
                 {
-                    ThemeDTO themeDto = new ThemeDTO()
-                    {
-                        Header = theme.Header,
-                        MainText = theme.MainText,
-                    };
+                    Header = theme.Header,
+                    MainText = theme.MainText,
+                };
 
-                    OperationDetails operationDetails = await service.Create(themeDto);
-                    if (operationDetails.Succedeed)
-                        return RedirectToAction("Index");
-                    else
-                        return View("Error", new ErrorModel() { ErrorMessge = "Can't create theme." });
-                }
-                return View("Error", new ErrorModel() { ErrorMessge = "Can't create theme." });
+                OperationDetails operationDetails = await service.Create(themeDto);
+                if (operationDetails.Succedeed)
+                    return RedirectToAction("Index");
+                else
+                    return View("Error", new ErrorModel() { ErrorMessge = "Can't create theme." });
+            }
+            return View("Error", new ErrorModel() { ErrorMessge = "Can't create theme." });
         }
 
 
@@ -179,7 +178,7 @@ namespace MVC.Controllers
             }
             catch
             {
-                return View("Error", new ErrorModel() { ErrorMessge = "Can't create post"});
+                return View("Error", new ErrorModel() { ErrorMessge = "Can't create post" });
             }
         }
 
@@ -195,7 +194,7 @@ namespace MVC.Controllers
                 return View("Delete", theme);
             }
             else {
-                    return View("Error", new ErrorModel() { ErrorMessge = "You are not admin"});
+                return View("Error", new ErrorModel() { ErrorMessge = "You are not admin" });
             }
         }
 
@@ -211,7 +210,33 @@ namespace MVC.Controllers
             }
             catch
             {
-                return View("Error", new ErrorModel() { ErrorMessge = "Can't delete theme"});
+                return View("Error", new ErrorModel() { ErrorMessge = "Can't delete theme" });
+            }
+        }
+
+
+        // GET: Theme/Delete/5
+        public ActionResult DeletePost(int id)
+        {
+            string tempid = User.Identity.GetUserId();
+         
+                ViewBag.PostId = id;
+                PostPO post = PostPOMapper.Map(postService.GetById(id));
+                return View("DeletePost", post);
+        }
+
+        // POST: Theme/Delete/5
+        [HttpPost]
+        public ActionResult DeletePost(int id, FormCollection collection)
+        {
+            try
+            {
+                postService.Delete(id);
+                return RedirectToAction("Index");
+            }
+            catch
+            {
+                return View("Error", new ErrorModel() { ErrorMessge = "Can't delete post" });
             }
         }
     }

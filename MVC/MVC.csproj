@@ -288,6 +288,7 @@
     <Content Include="Views\Theme\Error.cshtml" />
     <Content Include="Views\Theme\Delete.cshtml" />
     <Content Include="Views\Account\PrivateAccount.cshtml" />
+    <Content Include="Views\Theme\DeletePost.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />

@@ -23,13 +23,8 @@ namespace BLL.Interfaces
     public interface IPostService : IDisposable
     {
         void Create(PostDTO postDto);
-        ApplicationUser GetUser(PostDTO postDto);
-
-        //IEnumerable<PostDTO> GetPosts(ThemeDTO themeDto);
-        //IEnumerable<ThemeDTO> GetAllTheme();
-        //ThemeDTO FindByHeader(string header);
-        //ThemeDTO FindById(int id);
-
+        PostDTO GetById(int id);
+        void Delete(int id);
     }
 
 }

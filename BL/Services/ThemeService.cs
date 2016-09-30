@@ -19,7 +19,7 @@ namespace BLL.Services
         {
             Database = uow;
         }
-
+        
         public async Task<OperationDetails> Create(ThemeDTO themeDto)
         {
             try
@@ -53,7 +53,15 @@ namespace BLL.Services
         {
             if (themeDto == null)
                 throw new ValidationException("Can't get posts", "null parametr");
-            return PostMapper.Map(Database.ThemeRepository.GetPosts(themeDto.ThemeId).ToList());
+            var posts = PostMapper.Map(Database.ThemeRepository.GetPosts(themeDto.ThemeId).ToList());
+            foreach (var post in posts)
+            {
+                var tempUsers = Database.UserManager.Users.Where(u => u.Id == post.UserId).ToList();   
+                var tempUser = UserMapper.Map(tempUsers[0]);
+                post.UserName = tempUser.Name;
+                post.UserEmail = tempUser.Email;
+            }
+            return posts;
         }
 
         public IEnumerable<ThemeDTO> GetAllTheme()

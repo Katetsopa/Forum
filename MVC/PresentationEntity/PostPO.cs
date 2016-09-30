@@ -10,10 +10,9 @@ namespace MVC.PresentationEntity
     {
         public int PostId { get; set; }
         public string MainText { get; set; }
-
-        //[DataType (DataType.DateTime)]
-        //public DateTime Date { get; set; }
         public string UserId { get; set; }
+        public string UserName { get; set; }
+        public string UserEmail { get; set; }
         public int ThemeId { get; set; }
     }
 

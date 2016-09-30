@@ -14,5 +14,11 @@ namespace MVC.Models
 
         [Required]
         public int ThemeId { get; set; }
+
+        [Required]
+        public string UserId { get; set; }
+
+        [Required]
+        public string UserName { get; set; }
     }
 }

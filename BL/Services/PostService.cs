@@ -34,14 +34,22 @@ namespace BLL.Services
             catch { throw new ValidationException("Problems with creation new theme", ""); }
         }
 
-        public ApplicationUser GetUser(PostDTO postDto)
-        {
-            throw new NotImplementedException();
-        }
+      
 
         public void Dispose()
         {
             Database.Dispose();
+        }
+
+        public PostDTO GetById(int id)
+        {
+           return MapperDTO.PostMapper.Map( Database.PostRepository.Find(id));
+        }
+
+        public void Delete(int id)
+        {
+            Database.PostRepository.Delete(id);
+            Database.SaveAsync();
         }
 
         //public void Create(ThemeDTO themeDto)

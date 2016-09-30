@@ -23,6 +23,8 @@ namespace DAL.Repository
             Context.Set<TEntity>().Add(entity);
         }
 
+      
+
         public void AddRange(IEnumerable<TEntity> entities)
         {
             Context.Set<TEntity>().AddRange(entities);

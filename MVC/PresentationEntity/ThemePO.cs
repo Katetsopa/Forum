@@ -10,9 +10,6 @@ namespace MVC.PresentationEntity
         public int ThemeId { get; set; }
         public string Header { get; set; }
         public string MainText { get; set; }
-        //public DateTime date { get; set; }
-
-        // public int UserId { get; set; }
         public virtual List<PostPO> Posts { get; set; }
     }
 }
