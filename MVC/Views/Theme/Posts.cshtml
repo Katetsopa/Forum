@@ -1,0 +1,33 @@
+﻿@model MVC.PresentationEntity.ThemePO
+
+@{
+    ViewBag.Title = "Details";
+}
+
+<div class="jumbotron">
+
+    <h2>     @Html.DisplayFor(model => model.Header) </h2>
+
+    @Html.DisplayFor(model => model.MainText)
+
+</div>
+
+
+ @foreach (var item in Model.Posts)
+    {
+        <div class="thumbnail">
+            <div class="header">
+                @Html.DisplayFor(modelItem => item.UserName)
+
+            </div>
+            <div class="left">
+                @Html.DisplayFor(modelItem => item.MainText)
+            </div>
+            <div class="right">
+                @if (User.IsInRole("admin") || (item.UserEmail == User.Identity.Name))
+                { @Html.ActionLink("Delete", "DeletePost", new { id = item.PostId, themeId = item.ThemeId })}
+            </div>
+        </div>
+    }
+
+

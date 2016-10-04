@@ -1,9 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
+﻿using System.Linq;
 using System.Web;
 using System.Web.Mvc;
-using BLL;
 using MVC.PresentationMapper;
 using BLL.DTO;
 using MVC.Models;
@@ -22,55 +19,6 @@ namespace MVC.Controllers
         IThemeService service;
         IPostService postService;
 
-        private ApplicationSignInManager _signInManager;
-        private ApplicationUserManager _userManager;
-
-        public ThemeController(ApplicationUserManager userManager, ApplicationSignInManager signInManager)
-        {
-            UserManager = userManager;
-            SignInManager = signInManager;
-        }
-
-        private IUserService UserService1
-        {
-            get
-            {
-                return HttpContext.GetOwinContext().GetUserManager<IUserService>();
-            }
-        }
-
-        private IAuthenticationManager AuthenticationManager1
-        {
-            get
-            {
-                return HttpContext.GetOwinContext().Authentication;
-            }
-        }
-
-        public ApplicationSignInManager SignInManager
-        {
-            get
-            {
-                return _signInManager ?? HttpContext.GetOwinContext().Get<ApplicationSignInManager>();
-            }
-            private set
-            {
-                _signInManager = value;
-            }
-        }
-
-        public ApplicationUserManager UserManager
-        {
-            get
-            {
-                return _userManager ?? HttpContext.GetOwinContext().GetUserManager<ApplicationUserManager>();
-            }
-            private set
-            {
-                _userManager = value;
-            }
-        }
-
         public ThemeController(IThemeService ser, IPostService postserv)
         {
             service = ser;
@@ -83,21 +31,46 @@ namespace MVC.Controllers
             var themes = ThemePOMapper.Map(service.GetAllTheme().ToList());
             return View(themes);
         }
+        
+
+
 
         [HttpPost]
         [HandleError(View = "Error")]
         public ActionResult Details(PostPO post)
         {
-            if (post.MainText != null)
+            if (ModelState.IsValid)
             {
                 return RedirectToAction("CreatePost", post);
             }
-            return View();
+             return RedirectToAction("Details", "Theme", new { id = post.ThemeId });
+           
         }
 
         // GET: Theme/Details/5
         [HttpGet]
         public ActionResult Details(int id, PostPO post)
+        {
+                ViewBag.ThemeId = id;
+                if (service.FindById(ViewBag.ThemeId) == null)
+                {
+                    return RedirectToAction("Index");
+                }
+                var temp = service.FindById(id);
+                var temp1 = service.GetPosts(temp);
+                var posts = PostPOMapper.Map(temp1.ToList());
+
+                ThemePO theme = new ThemePO() { ThemeId = id, Header = temp.Header, MainText = temp.MainText, Posts = posts };
+                return View(theme);
+
+        }
+
+
+
+
+        [HttpPost]
+        [HandleError(View = "Error")]
+        public ActionResult Posts(int id)
         {
             ViewBag.ThemeId = id;
             if (service.FindById(ViewBag.ThemeId) == null)
@@ -109,8 +82,29 @@ namespace MVC.Controllers
             var posts = PostPOMapper.Map(temp1.ToList());
 
             ThemePO theme = new ThemePO() { ThemeId = id, Header = temp.Header, MainText = temp.MainText, Posts = posts };
-            return View(theme);
+            return PartialView("Posts", theme);
         }
+
+        
+
+
+        [HttpGet]
+        public ActionResult Posts(int id, PostPO post)
+        {
+                ViewBag.ThemeId = id;
+                if (service.FindById(ViewBag.ThemeId) == null)
+                {
+                    return RedirectToAction("Index");
+                }
+                var temp = service.FindById(id);
+                var temp1 = service.GetPosts(temp);
+                var posts = PostPOMapper.Map(temp1.ToList());
+
+                ThemePO theme = new ThemePO() { ThemeId = id, Header = temp.Header, MainText = temp.MainText, Posts = posts };
+               return PartialView("Posts", theme);
+        }
+
+
 
         // GET: Theme/Create
         [Authorize(Roles = "admin")]
@@ -118,6 +112,8 @@ namespace MVC.Controllers
         {
             return View("CreateTheme");
         }
+
+
 
         // POST: Theme/Create
         [HttpPost]
@@ -136,10 +132,12 @@ namespace MVC.Controllers
                 if (operationDetails.Succedeed)
                     return RedirectToAction("Index");
                 else
-                    return View("Error", new ErrorModel() { ErrorMessge = "Can't create theme." });
+                    return View("Error");
             }
-            return View("Error", new ErrorModel() { ErrorMessge = "Can't create theme." });
+            return View("Error");
         }
+
+
 
 
         [HttpGet]
@@ -157,6 +155,9 @@ namespace MVC.Controllers
             }
             return RedirectToAction("Details", "Theme", new { id = post.ThemeId });
         }
+
+
+
 
         [HttpPost]
         [Authorize]
@@ -178,9 +179,11 @@ namespace MVC.Controllers
             }
             catch
             {
-                return View("Error", new ErrorModel() { ErrorMessge = "Can't create post" });
+                return View("Error");
             }
         }
+
+
 
 
         // GET: Theme/Delete/5
@@ -194,9 +197,12 @@ namespace MVC.Controllers
                 return View("Delete", theme);
             }
             else {
-                return View("Error", new ErrorModel() { ErrorMessge = "You are not admin" });
+                return View("Error");
             }
         }
+
+
+
 
         // POST: Theme/Delete/5
         [HttpPost]
@@ -210,13 +216,15 @@ namespace MVC.Controllers
             }
             catch
             {
-                return View("Error", new ErrorModel() { ErrorMessge = "Can't delete theme" });
+                return View("Error");
             }
         }
 
 
+
+
         // GET: Theme/Delete/5
-        public ActionResult DeletePost(int id)
+        public ActionResult DeletePost(int id, int themeId)
         {
             string tempid = User.Identity.GetUserId();
          
@@ -225,18 +233,23 @@ namespace MVC.Controllers
                 return View("DeletePost", post);
         }
 
+
+
+
+
         // POST: Theme/Delete/5
         [HttpPost]
-        public ActionResult DeletePost(int id, FormCollection collection)
+        public ActionResult DeletePost(int id, int themeId, FormCollection collection)
         {
             try
             {
                 postService.Delete(id);
-                return RedirectToAction("Index");
+
+                return RedirectToAction("Details", "Theme", new { id = themeId });
             }
             catch
             {
-                return View("Error", new ErrorModel() { ErrorMessge = "Can't delete post" });
+                return View("Error");
             }
         }
     }

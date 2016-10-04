@@ -14,8 +14,6 @@ namespace MVC
 {
     public partial class Startup
     {
-
-        //Фабрикой создаёться сервис для работы с сервисами
         IServiceCreator serviceCreator = new ServiceCreator();
         // For more information on configuring authentication, please visit http://go.microsoft.com/fwlink/?LinkId=301864
         public void ConfigureAuth(IAppBuilder app)
@@ -74,10 +72,10 @@ namespace MVC
         }
 
 
-           private IUserService CreateUserService()
-           {
-                return serviceCreator.CreateUserService("ForumContext");
-           }
+        private IUserService CreateUserService()
+        {
+            return serviceCreator.CreateUserService("ForumContext");
+        }
 
         private IThemeService CreateThemeService()
         {

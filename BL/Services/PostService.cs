@@ -1,14 +1,9 @@
 ﻿using BLL.Interfaces;
 using DAL.Interfaces;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using BLL.DTO;
-using DAL.Entity;
 using BLL.Infrastructure;
 using BLL.MapperDTO;
+using System;
 
 namespace BLL.Services
 {
@@ -23,28 +18,36 @@ namespace BLL.Services
 
         public void Create(PostDTO postDto)
         {
-            if (postDto == null)
-                throw new ValidationException("Can't create new theme", "null theme parametr");
             try
             {
-                var post = PostMapper.Map(postDto);
-                Database.PostRepository.Add(post);
-                Database.SaveAsync();
+                if (postDto != null)
+                {
+                    var post = PostMapper.Map(postDto);
+                    Database.PostRepository.Add(post);
+                    Database.SaveAsync();
+                }
+                else
+                    throw new BLLException("Can't create new theme");
             }
-            catch { throw new ValidationException("Problems with creation new theme", ""); }
+            catch(Exception ex)
+            {
+                throw new BLLException("Problems with creation new theme", ex);
+            }
         }
 
-      
-
-        public void Dispose()
-        {
-            Database.Dispose();
-        }
 
         public PostDTO GetById(int id)
         {
-           return MapperDTO.PostMapper.Map( Database.PostRepository.Find(id));
+            try
+            {
+                return MapperDTO.PostMapper.Map(Database.PostRepository.Find(id));
+            }
+            catch(Exception ex)
+            {
+                throw new BLLException("Can't create new theme", ex);
+            }
         }
+
 
         public void Delete(int id)
         {
@@ -52,17 +55,11 @@ namespace BLL.Services
             Database.SaveAsync();
         }
 
-        //public void Create(ThemeDTO themeDto)
-        //{
-        //    if (themeDto == null)
-        //        throw new ValidationException("Can't create new theme", "null theme parametr");
-        //    try
-        //    {
-        //        var theme = ThemeMapper.Map(themeDto);
-        //        Database.ThemeRepository.Add(theme);
-        //        Database.SaveAsync();
-        //    }
-        //    catch { throw new ValidationException("Problems with creation new theme", ""); }
-        //}
+
+
+        public void Dispose()
+        {
+            Database.Dispose();
+        }
     }
 }

@@ -1,8 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Security.Claims;
-using System.Text;
 using System.Threading.Tasks;
 using BLL.DTO;
 using BLL.Infrastructure;
@@ -26,13 +24,18 @@ namespace BLL.Services
 
         public async Task<ClaimsIdentity> Authenticate(UserDTO userDto)
         {
-            ClaimsIdentity claim = null;
-            // находим пользователя
-            ApplicationUser user = await Database.UserManager.FindAsync(userDto.Email, userDto.Password);
-            // авторизуем его и возвращаем объект ClaimsIdentity
-            if (user != null)
-                claim = await Database.UserManager.CreateIdentityAsync(user, DefaultAuthenticationTypes.ApplicationCookie);
-            return claim;
+            try
+            {
+                ClaimsIdentity claim = null;
+                ApplicationUser user = await Database.UserManager.FindAsync(userDto.Email, userDto.Password);
+                if (user != null)
+                    claim = await Database.UserManager.CreateIdentityAsync(user, DefaultAuthenticationTypes.ApplicationCookie);
+                return claim;
+            }
+            catch (Exception ex)
+            {
+                throw new BLLException("",ex);
+            }
         }
         
         /// <summary>
@@ -42,32 +45,35 @@ namespace BLL.Services
         /// <returns></returns>
         public async Task<OperationDetails> Create(UserDTO userDto)
         {
-            ApplicationUser user = await Database.UserManager.FindByEmailAsync(userDto.Email);
-            if (user == null)
-            {                
-                ApplicationUser appUser = new ApplicationUser { Email=userDto.Email, PasswordHash = userDto.Password, EmailConfirmed = true, PhoneNumberConfirmed=false, TwoFactorEnabled=true, LockoutEnabled=false, AccessFailedCount = 5,  Name = userDto.Name ,  UserName = userDto.UserName };
-                try
+            try
+            {
+                ApplicationUser user = await Database.UserManager.FindByEmailAsync(userDto.Email);
+                if (user == null)
                 {
-                    await Database.UserManager.CreateAsync(appUser, userDto.Password);
-                    await Database.UserManager.AddToRoleAsync(appUser.Id, userDto.Role);
-                    await Database.SaveAsync();
-                    return new OperationDetails(true, "Successful registration", "");
+                    ApplicationUser appUser = new ApplicationUser { Email = userDto.Email, PasswordHash = userDto.Password, EmailConfirmed = true, PhoneNumberConfirmed = false, TwoFactorEnabled = true, LockoutEnabled = false, AccessFailedCount = 5, Name = userDto.Name, UserName = userDto.UserName };
+                    try
+                    {
+                        await Database.UserManager.CreateAsync(appUser, userDto.Password);
+                        await Database.UserManager.AddToRoleAsync(appUser.Id, userDto.Role);
+                        await Database.SaveAsync();
+                        return new OperationDetails(true, "Successful registration", "");
+                    }
+                    catch
+                    {
+                        return new OperationDetails(false, "Registration failed", "");
+                    }
                 }
-                catch
+                else
                 {
-                    return new OperationDetails(false, "Registration failed", "");
+                    return new OperationDetails(false, "User with such login already exists", "Email");
                 }
             }
-            else
+            catch(Exception ex)
             {
-                return new OperationDetails(false, "User with such login already exists", "Email");
+                throw new BLLException("Can't create user", ex);
             }
         }
 
-        public void Dispose()
-        {
-            Database.Dispose();
-        }
 
         /// <summary>
         /// Create user with list of roles
@@ -77,16 +83,29 @@ namespace BLL.Services
         /// <returns></returns>
         public async Task SetInitialData(UserDTO adminDto, List<string> roles)
         {
-            foreach (string roleName in roles)
+            try
             {
-                var role = await Database.RoleManager.FindByNameAsync(roleName);
-                if (role == null)
+                foreach (string roleName in roles)
                 {
-                    role = new ApplicationRole { Name = roleName };
-                    await Database.RoleManager.CreateAsync(role);
+                    var role = await Database.RoleManager.FindByNameAsync(roleName);
+                    if (role == null)
+                    {
+                        role = new ApplicationRole { Name = roleName };
+                        await Database.RoleManager.CreateAsync(role);
+                    }
                 }
+                await Create(adminDto);
             }
-            await Create(adminDto);
+            catch (Exception ex)
+            {
+                throw new BLLException("", ex);
+            }
+        }
+
+
+        public void Dispose()
+        {
+            Database.Dispose();
         }
     }
 }

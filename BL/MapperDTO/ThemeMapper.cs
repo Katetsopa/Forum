@@ -9,28 +9,35 @@ namespace BLL.MapperDTO
     {
         public static ThemeDTO Map(Theme entity)
         {
-            if (entity != null)
-            {
-                ThemeDTO result = new ThemeDTO() { ThemeId = entity.ThemeId, Header = entity.Header, MainText = entity.MainText, Posts = PostMapper.Map(entity.Posts) };
-                return result;
-            }
-            else return null;
+          return new ThemeDTO() {
+              ThemeId = entity.ThemeId,
+              Header = entity.Header,
+              MainText = entity.MainText,
+              Posts = PostMapper.Map(entity.Posts)
+           };
         }
 
         public static List<ThemeDTO> Map(List<Theme> entities)
         {
             List<ThemeDTO> result = new List<ThemeDTO>();
+
             foreach (var entity in entities)
             {
-                ThemeDTO res = new ThemeDTO() { ThemeId = entity.ThemeId, Header = entity.Header, MainText = entity.MainText , Posts = PostMapper.Map(entity.Posts)};
-                result.Add(res);
+                ThemeDTO temp = Map(entity);
+                result.Add(temp);
             }
-                return result;
+
+            return result;
         }
 
         public static Theme Map(ThemeDTO businessObject)
         {
-            Theme result = new Theme() { ThemeId = businessObject.ThemeId, Header = businessObject.Header, MainText = businessObject.MainText, Posts = PostMapper.Map(businessObject.Posts) };
+            Theme result = new Theme() {
+                ThemeId = businessObject.ThemeId,
+                Header = businessObject.Header,
+                MainText = businessObject.MainText,
+                Posts = PostMapper.Map(businessObject.Posts)
+            };
             return result;
         }
     }

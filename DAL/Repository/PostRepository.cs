@@ -1,11 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Data.Entity;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using DAL.Entity;
-using Microsoft.AspNet.Identity.EntityFramework;
+﻿using DAL.Entity;
 using DAL.Interfaces;
 
 namespace DAL.Repository

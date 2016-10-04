@@ -1,5 +1,4 @@
-﻿using System.Linq;
-using System.Threading.Tasks;
+﻿using System.Threading.Tasks;
 using System.Web;
 using System.Web.Mvc;
 using Microsoft.AspNet.Identity;
@@ -8,27 +7,14 @@ using Microsoft.Owin.Security;
 using MVC.Models;
 using BLL.DTO;
 using BLL.Infrastructure;
-using BLL.Services;
 using BLL.Intrfaces;
-using BLL.Interfaces;
 using System.Security.Claims;
-using BLL.MapperDTO;
 using System.Collections.Generic;
-using MVC.PresentationEntity;
 
 namespace MVC.Controllers
 {
     public class AccountController : Controller
     {
-        //private ApplicationSignInManager _signInManager;
-       // private ApplicationUserManager _userManager;
-
-
-       // public AccountController(ApplicationUserManager userManager, ApplicationSignInManager signInManager)
-        //{
-         //   UserManager = userManager;
-          //  SignInManager = signInManager;
-        //}
 
         private IUserService UserService
         {
@@ -46,29 +32,6 @@ namespace MVC.Controllers
             }
         }
 
-        //public ApplicationSignInManager SignInManager
-        //{
-        //    get
-        //    {
-        //        return _signInManager ?? HttpContext.GetOwinContext().Get<ApplicationSignInManager>();
-        //    }
-        //    private set
-        //    {
-        //        _signInManager = value;
-        //    }
-        //}
-
-        //public ApplicationUserManager UserManager
-        //{
-        //    get
-        //    {
-        //        return _userManager ?? HttpContext.GetOwinContext().GetUserManager<ApplicationUserManager>();
-        //    }
-        //    private set
-        //    {
-        //        _userManager = value;
-        //    }
-        //}
 
         //
         // GET: /Account/Login
@@ -81,7 +44,6 @@ namespace MVC.Controllers
             return View();
         }
 
-        //
         // POST: /Account/Login
         [HttpPost]
         [AllowAnonymous]
@@ -111,7 +73,7 @@ namespace MVC.Controllers
 
 
 
-        //
+        
         // GET: /Account/Register
         [AllowAnonymous]
         public ActionResult Register()
@@ -126,7 +88,7 @@ namespace MVC.Controllers
         [HttpPost]
         [AllowAnonymous]
         [ValidateAntiForgeryToken]
-        public async Task<ActionResult> Register(RegisterModel model)
+        public async Task<ActionResult> Register(RegisterViewModel model)
         {
             if (ModelState.IsValid)
             {
@@ -160,12 +122,9 @@ namespace MVC.Controllers
 
 
         // GET: /Account/PrivateAccount
-    
-
-       // [HttpGet]
         public ActionResult PrivateAccount()
         {
-            RegisterModel rm = new RegisterModel() { Email = User.Identity.GetUserName(), Name = "" };
+            RegisterViewModel rm = new RegisterViewModel() { Email = User.Identity.GetUserName(), Name = "" };
             return View(rm);
         }
 
@@ -176,19 +135,6 @@ namespace MVC.Controllers
             if (disposing)
             {
                 UserService.Dispose();
-                
-               // AuthenticationManager
-                //if (_userManager != null)
-                //{
-                //    _userManager.Dispose();
-                //    _userManager = null;
-                //}
-
-                //if (_signInManager != null)
-                //{
-                //    _signInManager.Dispose();
-                //    _signInManager = null;
-                //}
             }
 
             base.Dispose(disposing);
@@ -258,7 +204,7 @@ namespace MVC.Controllers
             {
                 Email = "Katya.tsopa@gmail.com",
                 UserName = "Katya.tsopa@gmail.com",
-                Password = "K_tsopa2003",
+                Password = "Kate1!",
                 Name = "Kate",
                 Role = "admin",
             }, new List<string> { "user", "admin" });

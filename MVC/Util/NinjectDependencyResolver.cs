@@ -9,7 +9,6 @@ using Ninject;
 using Ninject.Web.Common;
 using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Web;
 using System.Web.Mvc;
 
@@ -34,8 +33,7 @@ namespace MVC.Util
         private void AddBindings()
         {
             kernel.Bind<IUserStore<ApplicationUser>>().To<UserStore<ApplicationUser>>();
-            kernel.Bind<IAuthenticationManager>().ToMethod( c => HttpContext.Current.GetOwinContext().Authentication).InRequestScope();
-            // kernel.Bind<UserManager<ApplicationUser>>().ToSelf();
+            kernel.Bind<IAuthenticationManager>().ToMethod(c => HttpContext.Current.GetOwinContext().Authentication).InRequestScope();
             kernel.Bind<IThemeService>().To<ThemeService>();
             kernel.Bind<IPostService>().To<PostService>();
             kernel.Bind<IUserService>().To<UserService>();

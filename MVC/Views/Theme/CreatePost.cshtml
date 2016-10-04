@@ -1,11 +1,11 @@
-﻿@model MVC.PresentationEntity.PostPO
+﻿@model MVC.Models.PostModel
 
 @{
     ViewBag.Title = "CreatePost";
 }
 
 <div class="thumbnail">
-    @using (Html.BeginForm())
+    @using (@Html.BeginForm())
     {
         <div class="header">
             @Html.AntiForgeryToken()
@@ -15,7 +15,7 @@
         </div>
 
         <div class="right">
-            <input type="submit" value="Create" class="btn btn-default" /> 
+            <input type="submit"  value="Create" class="btn btn-default" /> 
         </div>
     }
 </div>

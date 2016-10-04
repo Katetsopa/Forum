@@ -1,10 +1,5 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using System.Data.Entity;
-using Microsoft.AspNet.Identity.EntityFramework;
 using DAL.Interfaces;
 
 namespace DAL.Repository
@@ -22,7 +17,6 @@ namespace DAL.Repository
         {
             Context.Set<TEntity>().Add(entity);
         }
-
       
 
         public void AddRange(IEnumerable<TEntity> entities)

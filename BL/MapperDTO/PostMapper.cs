@@ -10,42 +10,54 @@ namespace BLL.MapperDTO
     {
         public static PostDTO Map(Post entity)
         {
-            return new PostDTO() { PostId = entity.PostId, MainText = entity.MainText, UserId = entity.UserId, ThemeId = entity.ThemeId };
-            // return Mapper.Map<Post, PostDTO>(entity);
+            return new PostDTO() {
+                PostId = entity.PostId,
+                MainText = entity.MainText,
+                UserId = entity.UserId,
+                ThemeId = entity.ThemeId
+            };
         }
 
         public static List<PostDTO> Map(List<Post> entities)
         {
             List<PostDTO> result = new List<PostDTO>();
+
             foreach (var entity in entities)
             {
-                PostDTO res = new PostDTO() { PostId = entity.PostId, MainText = entity.MainText, UserId = entity.UserId, ThemeId = entity.ThemeId };
+                PostDTO res = Map(entity);
                 result.Add(res);
             }
+
             return result;
-            //return Mapper.Map<List<Post>, List<PostDTO>>(entities);
+ 
         }
 
         public static Post Map(PostDTO businessObject)
         {
-            return new Post() { PostId = businessObject.PostId, MainText = businessObject.MainText, ThemeId = businessObject.ThemeId, UserId = businessObject.UserId };
-           // return Mapper.Map<PostDTO, Post>(businessObject);
+            return new Post() {
+                PostId = businessObject.PostId,
+                MainText = businessObject.MainText,
+                ThemeId = businessObject.ThemeId,
+                UserId = businessObject.UserId
+            };
+  
         }
 
         internal static List<Post> Map(List<PostDTO> businessObject)
         {
             List<Post> result = new List<Post>();
+
             if (businessObject != null)
             {
                 foreach (var p in businessObject)
                 {
-                    Post res = new Post() { PostId = p.PostId, MainText = p.MainText, ThemeId = p.ThemeId, UserId = p.UserId };
+                    Post res = Map(p); 
                     result.Add(res);
                 }
                 return result;
             }
-            else return null;
-            
+            else
+                return null;
         }
     }
 }
