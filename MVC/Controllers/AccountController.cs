@@ -39,9 +39,15 @@ namespace MVC.Controllers
         [AllowAnonymous]
         public ActionResult Login(string returnUrl)
         {
-
-            ViewBag.ReturnUrl = returnUrl;
-            return View();
+            try
+            {
+                ViewBag.ReturnUrl = returnUrl;
+                return View();
+            }
+            catch(BLLException)
+            {
+                return View("Error");
+            }
         }
 
         // POST: /Account/Login
@@ -50,25 +56,32 @@ namespace MVC.Controllers
         [ValidateAntiForgeryToken]
         public async Task<ActionResult> Login(LoginViewModel model, string returnUrl)
         {
-            if (ModelState.IsValid)
+            try
             {
-                UserDTO userDto = new UserDTO { Email = model.Email, Password = model.Password };
-                ClaimsIdentity claim = await UserService.Authenticate(userDto);
-                if (claim == null)
+                if (ModelState.IsValid)
                 {
-                    ModelState.AddModelError("", "Неверный логин или пароль.");
-                }
-                else
-                {
-                    AuthenticationManager.SignOut();
-                    AuthenticationManager.SignIn(new AuthenticationProperties
+                    UserDTO userDto = new UserDTO { Email = model.Email, Password = model.Password };
+                    ClaimsIdentity claim = await UserService.Authenticate(userDto);
+                    if (claim == null)
                     {
-                        IsPersistent = true
-                    }, claim);
-                    return RedirectToAction("Index", "Home");
+                        ModelState.AddModelError("", "Неверный логин или пароль.");
+                    }
+                    else
+                    {
+                        AuthenticationManager.SignOut();
+                        AuthenticationManager.SignIn(new AuthenticationProperties
+                        {
+                            IsPersistent = true
+                        }, claim);
+                        return RedirectToAction("Index", "Home");
+                    }
                 }
+                return View(model);
             }
-            return View(model);
+            catch(BLLException)
+            {
+                return View("Error");
+            }
         }
 
 
@@ -90,23 +103,30 @@ namespace MVC.Controllers
         [ValidateAntiForgeryToken]
         public async Task<ActionResult> Register(RegisterViewModel model)
         {
-            if (ModelState.IsValid)
+            try
             {
-                UserDTO userDto = new UserDTO
+                if (ModelState.IsValid)
                 {
-                    Email = model.Email,
-                    UserName = model.Email,
-                    Password = model.Password,
-                    Name = model.Name,
-                    Role = "user"
-                };
-                 OperationDetails operationDetails = await UserService.Create(userDto);
-            if (operationDetails.Succedeed)
-                    return View("SuccessRegister");
-                else
-                    ModelState.AddModelError(operationDetails.Property, operationDetails.Message);
+                    UserDTO userDto = new UserDTO
+                    {
+                        Email = model.Email,
+                        UserName = model.Email,
+                        Password = model.Password,
+                        Name = model.Name,
+                        Role = "user"
+                    };
+                    OperationDetails operationDetails = await UserService.Create(userDto);
+                    if (operationDetails.Succedeed)
+                        return View("SuccessRegister");
+                    else
+                        ModelState.AddModelError(operationDetails.Property, operationDetails.Message);
+                }
+                return View(model);
             }
-            return View(model);
+            catch (BLLException)
+            {
+                return View("Error");
+            }
         }
 
 
@@ -115,8 +135,15 @@ namespace MVC.Controllers
         // POST: /Account/Logout
         public ActionResult Logout()
         {
-            AuthenticationManager.SignOut();
-            return RedirectToAction("Index", "Home");
+            try
+            {
+                AuthenticationManager.SignOut();
+                return RedirectToAction("Index", "Home");
+            }
+            catch (BLLException)
+            {
+                return View("Error");
+            }
         }
 
 
@@ -124,8 +151,15 @@ namespace MVC.Controllers
         // GET: /Account/PrivateAccount
         public ActionResult PrivateAccount()
         {
-            RegisterViewModel rm = new RegisterViewModel() { Email = User.Identity.GetUserName(), Name = "" };
-            return View(rm);
+            try
+            {
+                RegisterViewModel rm = new RegisterViewModel() { Email = User.Identity.GetUserName(), Name = "" };
+                return View(rm);
+            }
+            catch (BLLException)
+            {
+                return View("Error");
+            }
         }
 
 
@@ -160,15 +194,7 @@ namespace MVC.Controllers
             }
         }
 
-        private ActionResult RedirectToLocal(string returnUrl)
-        {
-            if (Url.IsLocalUrl(returnUrl))
-            {
-                return Redirect(returnUrl);
-            }
-            return RedirectToAction("Index", "Home");
-        }
-
+        
         internal class ChallengeResult : HttpUnauthorizedResult
         {
             public ChallengeResult(string provider, string redirectUri)

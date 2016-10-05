@@ -28,8 +28,15 @@ namespace MVC.Controllers
         // GET: Theme
         public ActionResult Index()
         {
-            var themes = ThemePOMapper.Map(service.GetAllTheme().ToList());
-            return View(themes);
+            try
+            {
+                var themes = ThemePOMapper.Map(service.GetAllTheme().ToList());
+                return View(themes);
+            }
+            catch (BLLException)
+            {
+                return View("Error");
+            }
         }
         
 
@@ -39,18 +46,26 @@ namespace MVC.Controllers
         [HandleError(View = "Error")]
         public ActionResult Details(PostPO post)
         {
-            if (ModelState.IsValid)
+            try
             {
-                return RedirectToAction("CreatePost", post);
+                if (ModelState.IsValid)
+                {
+                    return RedirectToAction("CreatePost", post);
+                }
+                return RedirectToAction("Details", "Theme", new { id = post.ThemeId });
             }
-             return RedirectToAction("Details", "Theme", new { id = post.ThemeId });
-           
+            catch (BLLException)
+            {
+                return View("Error");
+            }
         }
 
         // GET: Theme/Details/5
         [HttpGet]
         public ActionResult Details(int id, PostPO post)
         {
+            try
+            {
                 ViewBag.ThemeId = id;
                 if (service.FindById(ViewBag.ThemeId) == null)
                 {
@@ -62,7 +77,11 @@ namespace MVC.Controllers
 
                 ThemePO theme = new ThemePO() { ThemeId = id, Header = temp.Header, MainText = temp.MainText, Posts = posts };
                 return View(theme);
-
+            }
+            catch (BLLException)
+            {
+                return View("Error");
+            }
         }
 
 
@@ -72,25 +91,8 @@ namespace MVC.Controllers
         [HandleError(View = "Error")]
         public ActionResult Posts(int id)
         {
-            ViewBag.ThemeId = id;
-            if (service.FindById(ViewBag.ThemeId) == null)
+            try
             {
-                return RedirectToAction("Index");
-            }
-            var temp = service.FindById(id);
-            var temp1 = service.GetPosts(temp);
-            var posts = PostPOMapper.Map(temp1.ToList());
-
-            ThemePO theme = new ThemePO() { ThemeId = id, Header = temp.Header, MainText = temp.MainText, Posts = posts };
-            return PartialView("Posts", theme);
-        }
-
-        
-
-
-        [HttpGet]
-        public ActionResult Posts(int id, PostPO post)
-        {
                 ViewBag.ThemeId = id;
                 if (service.FindById(ViewBag.ThemeId) == null)
                 {
@@ -101,7 +103,38 @@ namespace MVC.Controllers
                 var posts = PostPOMapper.Map(temp1.ToList());
 
                 ThemePO theme = new ThemePO() { ThemeId = id, Header = temp.Header, MainText = temp.MainText, Posts = posts };
-               return PartialView("Posts", theme);
+                return PartialView("Posts", theme);
+            }
+            catch (BLLException)
+            {
+                return View("Error");
+            }
+        }
+
+        
+
+
+        [HttpGet]
+        public ActionResult Posts(int id, PostPO post)
+        {
+            try
+            {
+                ViewBag.ThemeId = id;
+                if (service.FindById(ViewBag.ThemeId) == null)
+                {
+                    return RedirectToAction("Index");
+                }
+                var temp = service.FindById(id);
+                var temp1 = service.GetPosts(temp);
+                var posts = PostPOMapper.Map(temp1.ToList());
+
+                ThemePO theme = new ThemePO() { ThemeId = id, Header = temp.Header, MainText = temp.MainText, Posts = posts };
+                return PartialView("Posts", theme);
+            }
+            catch (BLLException)
+            {
+                return View("Error");
+            }
         }
 
 
@@ -110,7 +143,14 @@ namespace MVC.Controllers
         [Authorize(Roles = "admin")]
         public ActionResult Create()
         {
-            return View("CreateTheme");
+            try
+            {
+                return View("CreateTheme");
+            }
+            catch (BLLException)
+            {
+                return View("Error");
+            }
         }
 
 
@@ -120,21 +160,28 @@ namespace MVC.Controllers
         [Authorize(Roles = "admin")]
         public async System.Threading.Tasks.Task<ActionResult> Create(ThemeModel theme)
         {
-            if (ModelState.IsValid)
+            try
             {
-                ThemeDTO themeDto = new ThemeDTO()
+                if (ModelState.IsValid)
                 {
-                    Header = theme.Header,
-                    MainText = theme.MainText,
-                };
+                    ThemeDTO themeDto = new ThemeDTO()
+                    {
+                        Header = theme.Header,
+                        MainText = theme.MainText,
+                    };
 
-                OperationDetails operationDetails = await service.Create(themeDto);
-                if (operationDetails.Succedeed)
-                    return RedirectToAction("Index");
-                else
-                    return View("Error");
+                    OperationDetails operationDetails = await service.Create(themeDto);
+                    if (operationDetails.Succedeed)
+                        return RedirectToAction("Index");
+                    else
+                        return View("Error");
+                }
+                return View("Error");
             }
-            return View("Error");
+            catch catch (BLLException)
+            {
+                return View("Error");
+            }
         }
 
 
@@ -143,17 +190,24 @@ namespace MVC.Controllers
         [HttpGet]
         public ActionResult CreatePost(PostPO post)
         {
-            if (ModelState.IsValid)
+            try
             {
-                PostDTO postDto = new PostDTO()
+                if (ModelState.IsValid)
                 {
-                    ThemeId = post.ThemeId,
-                    MainText = post.MainText,
-                    UserId = User.Identity.GetUserId()
-                };
-                postService.Create(postDto);
+                    PostDTO postDto = new PostDTO()
+                    {
+                        ThemeId = post.ThemeId,
+                        MainText = post.MainText,
+                        UserId = User.Identity.GetUserId()
+                    };
+                    postService.Create(postDto);
+                }
+                return RedirectToAction("Details", "Theme", new { id = post.ThemeId });
             }
-            return RedirectToAction("Details", "Theme", new { id = post.ThemeId });
+            catch (BLLException)
+            {
+                return View("Error");
+            }
         }
 
 
@@ -189,14 +243,22 @@ namespace MVC.Controllers
         // GET: Theme/Delete/5
         public ActionResult Delete(int id)
         {
-            string tempid = User.Identity.GetUserId();
-            if (User.IsInRole("admin"))
+            try
             {
-                ViewBag.ThemeId = id;
-                ThemePO theme = ThemePOMapper.Map(service.FindById(ViewBag.ThemeId));
-                return View("Delete", theme);
+                string tempid = User.Identity.GetUserId();
+                if (User.IsInRole("admin"))
+                {
+                    ViewBag.ThemeId = id;
+                    ThemePO theme = ThemePOMapper.Map(service.FindById(ViewBag.ThemeId));
+                    return View("Delete", theme);
+                }
+                else
+                {
+                    return View("Error");
+                }
             }
-            else {
+            catch (BLLException)
+            {
                 return View("Error");
             }
         }
@@ -226,11 +288,18 @@ namespace MVC.Controllers
         // GET: Theme/Delete/5
         public ActionResult DeletePost(int id, int themeId)
         {
-            string tempid = User.Identity.GetUserId();
-         
+            try
+            {
+                string tempid = User.Identity.GetUserId();
+
                 ViewBag.PostId = id;
                 PostPO post = PostPOMapper.Map(postService.GetById(id));
                 return View("DeletePost", post);
+            }
+            catch (BLLException)
+            {
+                return View("Error");
+            }
         }
 
 
