@@ -178,7 +178,7 @@ namespace MVC.Controllers
                 }
                 return View("Error");
             }
-            catch catch (BLLException)
+            catch (BLLException)
             {
                 return View("Error");
             }
